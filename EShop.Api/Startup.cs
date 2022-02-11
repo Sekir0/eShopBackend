@@ -18,7 +18,6 @@ using EShop.Domain.ThirdParty;
 using EShop.Domain.ThirdParty.CurrencyApi;
 using EShop.MsSql;
 using EShop.Redis;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -61,8 +60,8 @@ namespace EShop.Api
                 Host = Configuration["SMTP_HOST"],
                 Name = Configuration["SMTP_HOST"],
                 Password = Configuration["SMTP_PASSWORD"],
-                Port = int.Parse(Configuration["SMTP_PORT"]),
-                UseSsl = bool.Parse(Configuration["SMTP_USE_SSL"])
+                Port = Configuration.GetValue<int>("SMTP_PORT"),
+                UseSsl = Configuration.GetValue<bool>("SMTP_USE_SSL")
             };
             services.AddSingleton(smtpSettings);
 
@@ -79,12 +78,7 @@ namespace EShop.Api
             };
             services.AddSingleton(novaPoshtaSettings);
 
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+            services.AddAuthentication("Bearer")
                 .AddJwtBearer(x => 
                 { 
                     x.SaveToken = true; 
